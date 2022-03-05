@@ -1,0 +1,54 @@
+<head>
+    <title>Atomic</title>
+    <meta charset="utf-8">
+</head>
+<style>
+    body {
+        background-color: slategray;
+        height: 100%;
+        margin: 0px;
+    }
+    #renderCanvas { border-style: none; }
+</style>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('renderCanvas')
+        window.addEventListener('load', function windowOnLoad(e) {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            window.removeEventListener('load', windowOnLoad, true)
+        }, true)
+        
+        window.addEventListener('resize', function () {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+        })
+
+    </script>
+</body>
+<script src="simulation.js"></script>
+<script>
+    const ctx = canvas.getContext('2d')
+    const game = new Simulation(ctx, {
+        scale: 10
+    })
+    document.addEventListener('mousedown', function (e) {
+        game.particle({
+            coords: [e.offsetX, e.offsetY],
+            mass: 100000,
+            density: 0.01,
+            charge: 0
+        })
+    });
+
+    (async function render () {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        game.calculate()
+        game.render()
+        await new Promise(res => setTimeout(res, 1))
+        render();
+    })()
+
+
+</script>
