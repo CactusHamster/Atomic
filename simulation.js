@@ -45,19 +45,22 @@ class Simulation {
         this.particles.push(particle)
     }
     calculate () {
-        this.particles = this.particles.map(part => {
-            part.coords = part.coords.map((xy, i) => xy + part.velocity[i])
-            return part
-        })
-        let newParticles = this.particles.map((particle, currentIndex) => {
+        let accelerations = this.particles.map((particle, currentIndex) => {
+			let acceleration = [0,0]
             this.particles.forEach((otherParticle, otherIndex) => {
                 if (currentIndex == otherIndex) return;
-                let acceleration = this.constructor.acceleration(particle, otherParticle)
-                particle.velocity = particle.velocity.map((vel, i) => vel + acceleration[i])
+				let newAcel = this.constructor.acceleration(particle, otherParticle)
+                acceleration = acceleration.map((acel, i) => acel + newAcel[i])
+                //particle.velocity = particle.velocity.map((vel, i) => vel + acceleration[i])
             });
-            return particle;
+            return acceleration;
         })
-        this.particles = newParticles
+		let velocities = this.particles.map((particle, i) => particle.velocity.map((vel, ind) => vel + accelerations[i][ind]))
+        this.particles = this.particles.map((particle, i) => {
+			particle.velocity = velocities[i]
+			particle.coords = particle.coords.map((xy, i) => xy + particle.velocity[i])
+			return particle
+		})
     }
     render () {
         for (let particle of this.particles) {
